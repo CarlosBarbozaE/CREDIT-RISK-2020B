@@ -24,7 +24,7 @@ class Main:
     def sequence(self, length: int) -> List[int]:
         fibonacci_list = []
         for i in range(length):
-            fibonacci_list.append(self.element(i)) 
+            fibonacci_list.append(self.element(i))
 
         fibonacci_list = list(map(lambda x: round(x), fibonacci_list))
         return fibonacci_list
