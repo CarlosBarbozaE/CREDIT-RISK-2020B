@@ -3,6 +3,8 @@ from typing import Dict
 
 from .utils import get_current_utc
 
+DEFAULT_FILENAME = "./borrowers/candidates.json"
+
 
 class Borrower:
 
@@ -14,13 +16,32 @@ class Borrower:
         self.income = income
 
     def to_json(self) -> Dict:
-        # TODO: return a json with the: email, age, income, created_at, and updated_at
-        pass
+        return {
+            "email": self.email,
+            "age": self.age,
+            "income": self.income,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
 
-    def save(self, file: str):
+    def save(self, file: str = DEFAULT_FILENAME):
         # TODO: save the borrower into the json file!
-        pass
+        with open(file, "r") as f:
+            content = f.read()
+            jason = json.loads(content)
+            jason['candidates'].append(self.to_json())
+            with open(file, "w") as f2:
+                f2.write(json.dumps(jason, indent=4))
 
-    def update(self, file: str):
+    def update(self, file: str = DEFAULT_FILENAME):
         # TODO: update the borrower on the json file that match the email of the current borrower.
-        pass
+        with open(file) as f:
+            jason = json.load(f)
+            for i in jason['candidates']:
+                if i["email"] == self.email:
+                    i["age"] = self.age
+                    i["income"] = self.income
+                    i["updated_at"] = self.updated_at
+                jason["updated_at"] = self.updated_at
+                with open("./borrowers/candidates.json", 'w') as f2:
+                    f2.write(json.dumps(jason, indent=4))
