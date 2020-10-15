@@ -29,6 +29,24 @@ def method_caching(func):
     return wrapper
 
 
+def flatten_dict(self):
+    out = {}
+
+    def flatten_d(x, name=''):
+        if type(x) is dict:
+            for a in x:
+                flatten_d(x[a], name + a + '.')
+        elif type(x) is list:
+            i = 0
+            for a in x:
+                flatten_d(a, name + str(i) + '.')
+                i += 1
+        else:
+            out[name[:-1]] = x
+    flatten_d(self)
+    return out
+
+
 class StringWrapper:
     """
     This is the string wrapper.
