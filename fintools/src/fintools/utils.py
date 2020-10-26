@@ -1,4 +1,5 @@
 import functools
+import json
 import time
 from difflib import SequenceMatcher
 
@@ -11,7 +12,26 @@ def timeit(logger):
             out = func(*args, **kwargs)
             logger.warning("Execution time %s" % (time.time() - start))
             return out
+
         return wrapper
+
+    return decorator
+
+
+def print_terminal(logger, serializer_function=lambda obj: obj.__dict__):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            serial_obj = func(*args, **kwargs)
+            try:
+                formatted_output = json.dumps(serial_obj, indent=4, default=serializer_function)
+                print(formatted_output)
+            except TypeError as e:
+                logger.error("Type Error encounter with message {}".format(e))
+                raise
+
+        return wrapper
+
     return decorator
 
 
@@ -26,6 +46,7 @@ def method_caching(func):
             return simple_cache[key]
         simple_cache[key] = func(self, *args, **kwargs)
         return wrapper(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -61,3 +82,15 @@ class StringWrapper:
         pattern = self._sensitivity_matching(string=pattern)
         return self.contains(pattern, reverse=reverse) if exact \
             else self.similar_enough(pattern, threshold=threshold)
+
+    @staticmethod
+    def sensitivity_matching_meta_decorator():
+        def decorator(func):
+            @functools.wraps(func)
+            def wrapper(self, pattern, *args, **kwargs):
+                pattern = self._sensitivity_matching(string=pattern)
+                return func(self, pattern, *args, **kwargs)
+
+            return wrapper
+
+        return decorator
