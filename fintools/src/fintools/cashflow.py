@@ -8,13 +8,22 @@ class CashFlow:
         self.n = n
 
     def pv(self, r: float) -> 'CashFlow':
-        raise NotImplementedError
+        present = self.amount/(1+r)**self.n
+        return CashFlow(amount=present, n=0)
 
     def shift(self, n: int, r: float) -> 'CashFlow':
-        raise NotImplementedError
+        shift_value = self.amount*(1+r)**(n-self.n)
+        return CashFlow(amount=shift_value, n=n)
 
     def merge(self, other: 'CashFlow', r: float, reverse: bool = False) -> 'CashFlow':
-        raise NotImplementedError
+        if not reverse:
+            value = other.amount*(1+r)**(self.n-other.n)
+            merge_ = value+self.amount
+            return CashFlow(amount=merge_, n=self.n)
+        else:
+            value = self.amount*(1+r)**(other.n-self.n)
+            merge_ = value+other.amount
+            return CashFlow(amount=merge_, n=other.n)
 
     def to_dict(self, decimal_places: Optional[int] = 2) -> Dict:
         return {
